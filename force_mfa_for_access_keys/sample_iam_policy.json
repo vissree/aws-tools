@@ -1,0 +1,65 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "ListAllAccounts",
+            "Effect": "Allow",
+            "Action": [
+                "iam:ListAccountAliases",
+                "iam:ListUsers"
+            ],
+            "Resource": "arn:aws:iam::ACCOUNT-ID-WITHOUT-HYPHENS:user/*"
+        },
+        {
+            "Sid": "ManageOwnAccount",
+            "Effect": "Allow",
+            "Action": [
+                "iam:ChangePassword",
+                "iam:*LoginProfile",
+                "iam:GetAccount*",
+                "iam:*AccessKey*"
+            ],
+            "Resource": "arn:aws:iam::ACCOUNT-ID-WITHOUT-HYPHENS:user/${aws:username}"
+        },
+        {
+            "Sid": "ListAllMFA",
+            "Effect": "Allow",
+            "Action": "iam:List*MFA*",
+            "Resource": [
+                "arn:aws:iam::ACCOUNT-ID-WITHOUT-HYPHENS:mfa/*",
+                "arn:aws:iam::ACCOUNT-ID-WITHOUT-HYPHENS:user/${aws:username}"
+            ]
+        },
+        {
+            "Sid": "ManageOwnMFA",
+            "Effect": "Allow",
+            "Action": "iam:*MFA*",
+            "Resource": [
+                "arn:aws:iam::ACCOUNT-ID-WITHOUT-HYPHENS:mfa/${aws:username}",
+                "arn:aws:iam::ACCOUNT-ID-WITHOUT-HYPHENS:user/${aws:username}"
+            ]
+        },
+        {
+            "Sid": "GenerateTempTokens",
+            "Effect": "Allow",
+            "Action": [
+                "sts:GetSessionToken"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "DenyAllIfNoMFA",
+            "Effect": "Deny",
+            "NotAction": [
+                "iam:*",
+                "sts:*"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "Null": {
+                    "aws:MultiFactorAuthAge": "true"
+                }
+            }
+        }
+    ]
+}
